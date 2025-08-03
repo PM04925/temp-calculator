@@ -1,0 +1,111 @@
+-----------Update Date End Date
+//replace months with days
+int days = db.PlansTable.Where(p => p.PlanName == Plan).FirstOrDefault().PlanDuration;
+newMember.PlanEnd = newMember.PlanStart.AddDays(days);
+
+
+-----------Members with 90 day plans
+var membersWith90DayPlans = (from m in db.MemberTable
+                                             join p in db.PlanTable
+                                             on m.PlanId equals p.PlanId
+                                             where p.PlanDuration >= 90
+                                                   && m.PlanStatus == true
+                                                   && m.MemberIsVerified == true
+                                             select m).ToList();
+
+------------Members with 180 day plans
+var membersWith90DayPlans = (from m in db.MemberTable
+                                             join p in db.PlanTable
+                                             on m.PlanId equals p.PlanId
+                                             where p.PlanDuration >= 180
+                                                   && m.PlanStatus == true
+                                                   && m.MemberIsVerified == true
+                                             select m).ToList();
+
+-----------------------------PAGING------------------------------------------
+
+--------Member
+
+
+--Add in parameter: int page = 1
+
+--After String Search 
+
+int pageSize = 5;
+members = members.OrderBy(p => p.UserId).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+int totalItems = members.Count();
+ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+ViewBag.CurrentPage = page;
+
+--View Side:
+
+@for (int i = 1; i <= ViewBag.TotalPages; i++)
+{
+    <a href="@Url.Action("MembersDetails", new { page = i })"
+       class="@(i == ViewBag.CurrentPage ? "btn-success" : "btn-primary")">
+        @i
+    </a>
+}
+
+--------Trainer
+
+--Add in parameter: int page = 1
+
+--After String Search 
+int pageSize = 5;
+trainers= trainers.OrderBy(p => p.TrainerId).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+int totalItems = trainers.Count();
+ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+ViewBag.CurrentPage = page;
+
+--View Side:
+
+@for (int i = 1; i <= ViewBag.TotalPages; i++)
+{
+    <a href="@Url.Action("TrainerDetails", new { page = i })"
+       class="@(i == ViewBag.CurrentPage ? "btn-success" : "btn-primary")">
+        @i
+    </a>
+}
+
+--------Dietician
+
+--Add in parameter: int page = 1
+
+--After String Search 
+int pageSize = 5;
+dietician= dietician.OrderBy(p => p.DieticianId).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+int totalItems = dietician.Count();
+ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+ViewBag.CurrentPage = page;
+
+--View Side:
+
+@for (int i = 1; i <= ViewBag.TotalPages; i++)
+{
+    <a href="@Url.Action("DieticianDetails", new { page = i })"
+       class="@(i == ViewBag.CurrentPage ? "btn-success" : "btn-primary")">
+        @i
+    </a>
+}
+
+--------Plans
+
+--Add in parameter: int page = 1
+
+--After String Search 
+int pageSize = 5;
+plans= plans.OrderBy(p => p.PlanId).Skip((page - 1) * pageSize).Take(pageSize).ToList();
+int totalItems = plans.Count();
+ViewBag.TotalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+ViewBag.CurrentPage = page;
+
+--View Side:
+
+@for (int i = 1; i <= ViewBag.TotalPages; i++)
+{
+    <a href="@Url.Action("ShowPlans", new { page = i })"
+       class="@(i == ViewBag.CurrentPage ? "btn-success" : "btn-primary")">
+        @i
+    </a>
+}

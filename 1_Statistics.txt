@@ -1,0 +1,511 @@
+
+-------------------------------------------------Trainer--------------------------------------------------------
+
+----------Table: TrainerInformationTable 
+
+-- Add Model: TrainerStatisticsViewModel
+
+    public class TrainerStatisticsViewModel
+    {
+        public int TotalTrainers { get; set; }
+        public int VerifiedTrainers { get; set; }
+        public int UnverifiedTrainers { get; set; }
+        public Dictionary<string, int> GenderDistribution { get; set; }
+        public double AverageExperience { get; set; }
+        public Dictionary<string, int> SpecialityCounts { get; set; }
+        public Dictionary<string, int> AgeGroups { get; set; }
+    }
+
+
+-- Add Controller - Action Method:
+public ActionResult TrainerStats()
+        {
+            using (var db = new ApplicationContextDBConnect())
+            {
+                var stats = new TrainerStatisticsViewModel
+                {
+                    TotalTrainers = db.TrainerInformationTable.Count(),
+                    VerifiedTrainers = db.TrainerInformationTable.Count(t => t.TrainerIsVerified),
+                    UnverifiedTrainers = db.TrainerInformationTable.Count(t => !t.TrainerIsVerified),
+                    GenderDistribution = db.TrainerInformationTable
+                                          .GroupBy(t => t.TrainerGender)
+                                          .ToDictionary(g => g.Key, g => g.Count()),
+                    AverageExperience = db.TrainerInformationTable.Average(t => t.TrainerExperience),
+                    SpecialityCounts = db.TrainerInformationTable
+                                         .GroupBy(t => t.TrainerSpecialities)
+                                         .ToDictionary(g => g.Key, g => g.Count()),
+                    AgeGroups = db.TrainerInformationTable.AsEnumerable().GroupBy(t =>
+                                  {
+                                      int age = DateTime.Now.Year - t.TrainerDOB.Year;
+                                      if (t.TrainerDOB.Date > DateTime.Now.AddYears(-age)) age--;
+
+                                      if (age < 25) return "Under 25";
+                                      if (age < 35) return "25-34";
+                                      if (age < 45) return "35-44";
+                                      return "45+";
+                                  })
+                                  .ToDictionary(g => g.Key, g => g.Count())
+                };
+
+                return View(stats);
+            }
+        }
+
+-- Add View to Action:
+
+@model DemoTesting.Models.TrainerStatisticsViewModel
+
+<h2>Trainer Statistics</h2>
+
+
+	---------------------x------------------x------------------------x--------------------
+							Text Method
+
+<p>Total Trainers: @Model.TotalTrainers</p>
+<p>Verified Trainers: @Model.VerifiedTrainers</p>
+<p>Unverified Trainers: @Model.UnverifiedTrainers</p>
+
+<h3>Gender Distribution</h3>
+<ul>
+    @foreach (var gender in Model.GenderDistribution)
+    {
+        <li>@gender.Key: @gender.Value</li>
+    }
+</ul>
+
+<h3>Average Experience: @Model.AverageExperience years</h3>
+
+<h3>Speciality Breakdown</h3>
+<ul>
+    @foreach (var speciality in Model.SpecialityCounts)
+    {
+        <li>@speciality.Key: @speciality.Value</li>
+    }
+</ul>
+
+<h3>Age Distribution</h3>
+<ul>
+    @foreach (var ageGroup in Model.AgeGroups)
+    {
+        <li>@ageGroup.Key: @ageGroup.Value</li>
+    }
+</ul>
+		------------------x-------------------x-----------------x------------------------
+							Graph Method
+
+<h2>Trainer Statistics</h2>
+<style>
+    .chart-box{
+        height:400px;
+        width: 400px;
+    }
+    .chart-rectangle{
+        height:400px;
+        width: 600px;
+    }
+</style>
+
+<div class="chart-container">
+    <table style="align-content:center">
+        <tr>
+            <th>
+                <div class="chart-box">
+                    <canvas id="trainerVerificationChart"></canvas>
+                </div>
+            </th>
+            <th>
+                <div class="chart-box">
+                    <canvas id="genderChart"></canvas>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <div class="chart-rectangle">
+                    <canvas id="specialitiesChart"></canvas>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <div class="chart-rectangle">
+                    <canvas id="ageGroupChart"></canvas>
+                </div>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <div class="chart-rectangle">
+                    <canvas id="experienceChart"></canvas>
+                </div>
+            </th>
+        </tr>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+    new Chart(document.getElementById('trainerVerificationChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Verified', 'Unverified'],
+            datasets: [{
+                label: 'Trainer Verification',
+                data: [@Model.VerifiedTrainers, @Model.UnverifiedTrainers],
+                backgroundColor: ['#36A2EB', '#FF6384']
+            }]
+        }
+    });
+    
+    new Chart(document.getElementById('genderChart'), {
+        type: 'pie',
+        data: {
+            labels: [@Html.Raw(Json.Encode(Model.GenderDistribution.Keys))],
+            datasets: [{
+                data: @Html.Raw(Json.Encode(Model.GenderDistribution.Values)),
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+            }]
+        }
+    });
+
+    new Chart(document.getElementById('specialitiesChart'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Encode(Model.SpecialityCounts.Keys)),
+            datasets: [{
+                label: 'Speciality Count',
+                data: @Html.Raw(Json.Encode(Model.SpecialityCounts.Values)),
+                backgroundColor: '#36A2EB'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('ageGroupChart'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Encode(Model.AgeGroups.Keys)),
+            datasets: [{
+                label: 'Age Groups',
+                data: @Html.Raw(Json.Encode(Model.AgeGroups.Values)),
+                backgroundColor: '#FFCE56'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('experienceChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Average Experience'],
+            datasets: [{
+                label: 'Years',
+                data: [@Model.AverageExperience],
+                backgroundColor: '#4BC0C0'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            scales: {
+                x: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+ 
+-----------------------------------------------------------Member-------------------------------------------
+
+-- Create Model:
+public class MemberStatisticsViewModel
+{
+    public int TotalMembers { get; set; }
+    public int VerifiedMembers { get; set; }
+    public int UnverifiedMembers { get; set; }
+
+    public int ActivePlans { get; set; }
+    public int InactivePlans { get; set; }
+
+    public int MembersWithTrainer { get; set; }
+    public int MembersWithDietician { get; set; }
+
+    public double AverageHeight { get; set; }
+    public double AverageWeight { get; set; }
+
+    public Dictionary<string, int> BloodGroupDistribution { get; set; }
+    public Dictionary<string, int> PlansStartedPerMonth { get; set; }
+    public double AveragePlanDurationDays { get; set; }
+}
+
+
+-- Create Controller: 
+public ActionResult MemberStats()
+{
+    using (var db = new YourDbContext())
+    {
+        var members = db.MembersTable.ToList();
+
+        var stats = new MemberStatisticsViewModel
+        {
+            TotalMembers = members.Count,
+            VerifiedMembers = members.Count(m => m.MemberIsVerified),
+            UnverifiedMembers = members.Count(m => !m.MemberIsVerified),
+
+            ActivePlans = members.Count(m => m.PlanStatus),
+            InactivePlans = members.Count(m => !m.PlanStatus),
+
+            MembersWithTrainer = members.Count(m => !string.IsNullOrEmpty(m.TrainerId)),
+            MembersWithDietician = members.Count(m => !string.IsNullOrEmpty(m.DieticianId)),
+
+            AverageHeight = members.Any() ? members.Average(m => m.MemberHeight) : 0,
+            AverageWeight = members.Any() ? members.Average(m => m.MemberWeight) : 0,
+
+            BloodGroupDistribution = members
+                .GroupBy(m => m.MemberBloodGroup)
+                .ToDictionary(g => g.Key, g => g.Count()),
+
+            PlansStartedPerMonth = members
+                .Where(m => m.PlanStart != null)
+                .GroupBy(m => m.PlanStart.Value.ToString("yyyy-MM"))
+                .OrderBy(g => g.Key)
+                .ToDictionary(g => g.Key, g => g.Count()),
+
+            AveragePlanDurationDays = members
+                .Where(m => m.PlanStart != null && m.PlanEnd != null)
+                .Select(m => (m.PlanEnd.Value - m.PlanStart.Value).TotalDays)
+                .DefaultIfEmpty(0)
+                .Average()
+        };
+
+        return View(stats);
+    }
+}
+
+-- Create View:
+@model DemoTesting.Models.MemberStatisticsViewModel
+
+<style>
+    .chart-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .chart-box {
+        width: 400px;
+        height: 400px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    .chart-rectangle {
+        width: 600px;
+        height: 300px;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h2>Member Statistics</h2>
+
+<div class="chart-container">
+    <div class="chart-box">
+        <canvas id="verificationChart"></canvas>
+    </div>
+
+    <div class="chart-box">
+        <canvas id="planStatusChart"></canvas>
+    </div>
+
+    <div class="chart-rectangle">
+        <canvas id="bloodGroupChart"></canvas>
+    </div>
+
+    <div class="chart-rectangle">
+        <canvas id="planStartChart"></canvas>
+    </div>
+
+    <div class="chart-rectangle">
+        <canvas id="trainerDieticianChart"></canvas>
+    </div>
+
+    <div class="chart-rectangle">
+        <canvas id="avgHeightWeightChart"></canvas>
+    </div>
+
+    <div class="chart-rectangle">
+        <canvas id="avgPlanDurationChart"></canvas>
+    </div>
+</div>
+
+<script>
+    // Verified vs Unverified Members
+    new Chart(document.getElementById('verificationChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Verified', 'Unverified'],
+            datasets: [{
+                data: [@Model.VerifiedMembers, @Model.UnverifiedMembers],
+                backgroundColor: ['#36A2EB', '#FF6384']
+            }]
+        },
+        options: {
+            plugins: {
+                title: { display: true, text: 'Member Verification Status' }
+            }
+        }
+    });
+
+    // Plan Status Chart
+    new Chart(document.getElementById('planStatusChart'), {
+        type: 'pie',
+        data: {
+            labels: ['Active', 'Inactive'],
+            datasets: [{
+                data: [@Model.ActivePlans, @Model.InactivePlans],
+                backgroundColor: ['#4BC0C0', '#FFCE56']
+            }]
+        },
+        options: {
+            plugins: {
+                title: { display: true, text: 'Plan Status' }
+            }
+        }
+    });
+
+    // Blood Group Distribution
+    new Chart(document.getElementById('bloodGroupChart'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(Json.Encode(Model.BloodGroupDistribution.Keys)),
+            datasets: [{
+                label: 'Members',
+                data: @Html.Raw(Json.Encode(Model.BloodGroupDistribution.Values)),
+                backgroundColor: '#36A2EB'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Blood Group Distribution' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Plans Started Per Month
+    new Chart(document.getElementById('planStartChart'), {
+        type: 'line',
+        data: {
+            labels: @Html.Raw(Json.Encode(Model.PlansStartedPerMonth.Keys)),
+            datasets: [{
+                label: 'Plans Started',
+                data: @Html.Raw(Json.Encode(Model.PlansStartedPerMonth.Values)),
+                fill: false,
+                borderColor: '#FF6384',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Plans Started Per Month' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Members with Trainer / Dietician
+    new Chart(document.getElementById('trainerDieticianChart'), {
+        type: 'bar',
+        data: {
+            labels: ['With Trainer', 'With Dietician'],
+            datasets: [{
+                label: 'Count',
+                data: [@Model.MembersWithTrainer, @Model.MembersWithDietician],
+                backgroundColor: ['#9966FF', '#FF9F40']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Trainer & Dietician Assignments' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Average Height & Weight
+    new Chart(document.getElementById('avgHeightWeightChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Avg Height (cm)', 'Avg Weight (kg)'],
+            datasets: [{
+                label: 'Values',
+                data: [@Model.AverageHeight, @Model.AverageWeight],
+                backgroundColor: ['#FF6384', '#36A2EB']
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Average Height and Weight' }
+            },
+            scales: {
+                y: { beginAtZero: true }
+            }
+        }
+    });
+
+    // Average Plan Duration (Days)
+    new Chart(document.getElementById('avgPlanDurationChart'), {
+        type: 'bar',
+        data: {
+            labels: ['Average Plan Duration (days)'],
+            datasets: [{
+                label: 'Days',
+                data: [@Model.AveragePlanDurationDays],
+                backgroundColor: '#FFCE56'
+            }]
+        },
+        options: {
+            indexAxis: 'y',
+            responsive: true,
+            plugins: {
+                title: { display: true, text: 'Average Plan Duration' }
+            },
+            scales: {
+                x: { beginAtZero: true }
+            }
+        }
+    });
+</script>

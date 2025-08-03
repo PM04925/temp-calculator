@@ -1,0 +1,76 @@
+
+INSERT INTO TrainerInformationTable 
+(TrainerId, TrainerName, TrainerEmail, TrainerMobileNo, TrainerGender, TrainerDOB, TrainerBloodGroup, TrainerAddress, TrainerProof, TrainerExperience, TrainerSpecialities, TrainerIsVerified) 
+VALUES
+('T001', 'John Doe', 'johndoe@example.com', '9876543210', 'Male', '1985-03-15', 'O+', '123 Elm Street, NY', 'ID123456789', 10, 'Yoga', 1),
+('T002', 'Alice Smith', 'alice.smith@example.com', '9123456780', 'Female', '1990-07-20', 'A+', '456 Oak Avenue, CA', 'ID987654321', 6, 'Cardio', 1),
+('T003', 'Michael Lee', 'mike.lee@example.com', '9988776655', 'Male', '1988-11-05', 'B+', '789 Pine Blvd, TX', 'DL123456789', 8, 'Strength Training', 0),
+('T004', 'Sophia Green', 'sophia.green@example.com', '9090909090', 'Female', '1993-05-10', 'AB+', '321 Maple Lane, FL', 'Passport12345', 5, 'Pilates', 1),
+('T005', 'David Brown', 'david.brown@example.com', '9234567890', 'Male', '1980-12-01', 'O-', '654 Cedar Street, IL', 'GovtID009876', 12, 'CrossFit', 1),
+('T006', 'Emma Wilson', 'emma.w@example.com', '9345678901', 'Female', '1995-02-18', 'A-', '111 Birch Road, GA', 'ID4455667788', 4, 'Zumba', 0),
+('T007', 'Chris Johnson', 'chris.j@example.com', '9456789012', 'Male', '1987-09-25', 'B-', '222 Palm Drive, AZ', 'SSN123456789', 9, 'HIIT', 1),
+('T008', 'Lily Evans', 'lily.evans@example.com', '9567890123', 'Female', '1992-06-30', 'AB-', '333 Spruce Way, CO', 'PANABC1234D', 7, 'Aerobics', 0),
+('T009', 'Raj Patel', 'raj.patel@example.com', '9678901234', 'Male', '1984-08-08', 'O+', '444 Ash Court, NJ', 'AADHAR123456', 11, 'Bodybuilding', 1),
+('T010', 'Anita Das', 'anita.das@example.com', '9789012345', 'Female', '1991-04-22', 'A+', '555 Willow Dr, WA', 'VoterID789456', 6, 'Functional Training', 1);
+
+INSERT INTO DieticianTable 
+(DieticianId, DieticianName, DieticianEmail, DieticianMobileNo, DieticianGender, DieticianDOB, DieticianBloodGroup, DieticianAddress, DieticianProof, DieticianExperience, DieticianDegree, DieticianIsVerified) 
+VALUES
+('D001', 'Neha Sharma', 'neha.sharma@example.com', '9876543211', 'Female', '1989-04-12', 'B+', '22 Park Street, Delhi', 'ID987654321A', 7, 'M.Sc Nutrition', 1),
+('D002', 'Rohan Mehta', 'rohan.mehta@example.com', '9988776654', 'Male', '1985-08-19', 'A+', '14 Green Ave, Mumbai', 'PANBM1234M', 10, 'B.Sc Food Science', 1),
+('D003', 'Priya Iyer', 'priya.iyer@example.com', '9123456781', 'Female', '1992-01-05', 'O-', '88 Ocean View, Chennai', 'PassportX112233', 5, 'M.Sc Clinical Nutrition', 1),
+('D004', 'Amit Desai', 'amit.desai@example.com', '9090909091', 'Male', '1987-12-22', 'AB+', '4 Lotus Lane, Ahmedabad', 'AADHAR111122223333', 9, 'B.Sc Dietetics', 0),
+('D005', 'Sana Khan', 'sana.khan@example.com', '9234567891', 'Female', '1990-06-15', 'A-', '67 Sunset Blvd, Hyderabad', 'ID5566778899', 8, 'M.Sc Food Tech', 1),
+('D006', 'Vikram Rao', 'vikram.rao@example.com', '9345678902', 'Male', '1984-03-10', 'B-', '12 Palm Grove, Bangalore', 'VoterID332211', 11, 'PG Diploma Nutrition', 1),
+('D007', 'Anjali Verma', 'anjali.verma@example.com', '9456789013', 'Female', '1993-10-30', 'O+', '200 Lake Road, Pune', 'DL33445566', 4, 'B.Sc Nutrition', 0),
+('D008', 'Karan Kapoor', 'karan.kapoor@example.com', '9567890124', 'Male', '1988-07-25', 'AB-', '9 Riverbank, Chandigarh', 'GovID998877', 6, 'M.Sc Public Health', 1),
+('D009', 'Meera Nair', 'meera.nair@example.com', '9678901235', 'Female', '1991-09-17', 'A+', '45 Hilltop, Kochi', 'PANNAIR1234A', 5, 'Diploma Dietetics', 0),
+('D010', 'Rahul Singh', 'rahul.singh@example.com', '9789012346', 'Male', '1986-11-01', 'O+', '18 City Center, Lucknow', 'ID4455660099', 9, 'M.Sc Sports Nutrition', 1);
+
+INSERT INTO PlansTable 
+(PlanId, PlanName, PlanPrice, PlanDuration, PlanFeatures, IsActive) 
+VALUES
+('P001', 'Basic Plan', 499, 30, 'Access to gym equipment, Locker facility, 1 group class per week', 1),
+('P002', 'Standard Plan', 999, 30, 'Includes Basic Plan + 3 group classes per week, Diet plan consultation', 1),
+('P003', 'Premium Plan', 1499, 30, 'Includes Standard Plan + Personal trainer, Unlimited group classes', 1),
+('P004', 'Quarterly Plan', 2699, 90, 'Standard Plan benefits for 3 months + 1 health check-up', 1),
+('P005', 'Half-Yearly Plan', 4999, 180, 'Premium Plan benefits + 2 dietician consultations per month', 1),
+('P006', 'Annual Plan', 8999, 365, 'All features + priority support, 5 guest passes, Annual health screening', 1),
+('P007', 'Student Plan', 399, 30, 'Basic access for students with valid ID, Group class twice a week', 0),
+('P008', 'Weekend Plan', 599, 30, 'Access only on weekends, 2 group classes on weekends', 0),
+('P009', 'Couple Plan', 2799, 30, 'All Premium Plan features for 2 people, Shared trainer', 1),
+('P010', 'Family Plan', 9999, 365, 'Up to 4 members, Full access, Diet plans, Child fitness sessions', 1);
+
+-- Trainers
+INSERT INTO LoginTable 
+(Id, UserId, FullName, Email, MobileNo, DOB, Gender, UserPassword, UserConfirmPassword, UserRole)
+VALUES
+('L001', 'T001', 'John Doe', 'johndoe@example.com', '9876543210', '1985-03-15', 'Male', 'Password123', 'Password123', 'Trainer'),
+('L002', 'T002', 'Alice Smith', 'alice.smith@example.com', '9123456780', '1990-07-20', 'Female', 'SecurePass456', 'SecurePass456', 'Trainer'),
+
+-- Dieticians
+('L003', 'D001', 'Neha Sharma', 'neha.sharma@example.com', '9876543211', '1989-04-12', 'Female', 'Healthy@789', 'Healthy@789', 'Dietician'),
+('L004', 'D002', 'Rohan Mehta', 'rohan.mehta@example.com', '9988776654', '1985-08-19', 'Male', 'Nutri1234', 'Nutri1234', 'Dietician'),
+
+-- Members
+('L005', 'M001', 'Sneha Kapoor', 'sneha.kapoor@example.com', '9000000001', '1995-05-01', 'Female', 'Member#2024', 'Member#2024', 'Member'),
+('L006', 'M002', 'Arjun Rao', 'arjun.rao@example.com', '9000000002', '1992-09-12', 'Male', 'Fitness@001', 'Fitness@001', 'Member'),
+('L007', 'M003', 'Divya Nair', 'divya.nair@example.com', '9000000003', '1996-11-21', 'Female', 'Wellness@89', 'Wellness@89', 'Member'),
+('L008', 'M004', 'Kabir Singh', 'kabir.singh@example.com', '9000000004', '1991-07-10', 'Male', 'StayFit2024', 'StayFit2024', 'Member'),
+
+-- Another Trainer & Dietician
+('L009', 'T003', 'Michael Lee', 'mike.lee@example.com', '9988776655', '1988-11-05', 'Male', 'StrongPass!', 'StrongPass!', 'Trainer'),
+('L010', 'D003', 'Priya Iyer', 'priya.iyer@example.com', '9123456781', '1992-01-05', 'Female', 'NutriFit#1', 'NutriFit#1', 'Dietician');
+
+
+INSERT INTO MembersTable 
+(MemberId, MemberName, MemberAddress, UserId, PlanId, TrainerId, DieticianId, MemberHeight, MemberWeight, MemberBloodGroup, PlanStart, PlanEnd, PlanStatus, MemberHealthNotes, MemberIsVerified)
+VALUES
+('M001', 'Sneha Kapoor', 'Flat 21B, Green Residency, Mumbai', 'M001', 'P001', 'T001', 'D001', 160, 55, 'A+', '2025-08-01', '2025-08-31', 1, 'Mild lactose intolerance', 1),
+
+('M002', 'Arjun Rao', '12 Lake View Apartments, Bangalore', 'M002', 'P002', 'T002', 'D002', 175, 72, 'B+', '2025-07-20', '2025-08-19', 1, 'Knee injury history', 1),
+
+('M003', 'Divya Nair', '44 Ocean Drive, Kochi', 'M003', 'P003', NULL, 'D001', 162, 58, 'O+', '2025-07-25', '2025-08-24', 1, 'Vegan diet preference', 0),
+
+('M004', 'Kabir Singh', '19 Sector-10, Chandigarh', 'M004', 'P004', 'T001', NULL, 180, 78, 'AB+', '2025-07-28', '2025-08-27', 1, 'Smoker, needs weight loss', 1);
+

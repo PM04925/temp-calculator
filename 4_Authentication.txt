@@ -1,0 +1,16 @@
+-------------------At time of Sign In
+
+FormsAuthentication.SetAuthCookie(obj.PRNNo, false);
+
+
+------------------At time of Sign Out
+FormsAuthentication.SignOut();
+
+
+-----------------And Add
+[Authorize] keyword
+
+
+-----------------Add userRole in session
+
+Session["Role"] = user.UserId.ToString();
