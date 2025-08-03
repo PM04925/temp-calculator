@@ -1,0 +1,150 @@
+---------------------After User is created and Plan is selected
+
+
+-----------------------------CREATE TABLE
+CREATE TABLE PaymentsTable (
+    PaymentId nvarchar(50) NOT NULL PRIMARY KEY,
+    MemberId nvarchar(50) NOT NULL,
+    PlanId nvarchar(50) NOT NULL,
+    Amount int NOT NULL,
+    PaymentDate datetime NOT NULL,
+    PaymentStatus nvarchar(50) NOT NULL, 
+    PaymentMethod nvarchar(50) NOT NULL, 
+    TransactionId nvarchar(100) NULL,
+    CONSTRAINT FK_PaymentsTable_MemberId_MembersTable_MemberId FOREIGN KEY (MemberId) REFERENCES MembersTable(MemberId),
+    CONSTRAINT FK_PaymentsTable_PlanId_PlansTable_PlanId FOREIGN KEY (PlanId) REFERENCES PlansTable(PlanId)
+);
+GO
+
+-----------------------------CREATE MODULE
+public class PaymentTable
+    {
+        [Key]
+        public string PaymentId { get; set; }
+
+        public string MemberId { get; set; }
+
+        public string PlanId { get; set; }
+
+    
+        public int Amount { get; set; }
+
+      
+        public DateTime PaymentDate { get; set; }
+
+        public string PaymentStatus { get; set; }
+
+ 
+        public string PaymentMethod { get; set; }
+
+        public string TransactionId { get; set; }
+
+        [ForeignKey("MemberId")]
+        public virtual MemberTable Member { get; set; }
+
+        [ForeignKey("PlanId")]
+        public virtual PlanTable Plan { get; set; }
+    }
+
+------------------------DB Context
+        public DbSet<PaymentTable> PaymentTable { get; set; }
+
+        modelBuilder.Entity<PaymentTable>().ToTable("PaymentsTable");
+
+
+------------------------CONTROLLER
+using GymManagementSystem.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace GymManagementSystem.Controllers
+{
+    public class PaymentController : Controller
+    {
+        public ApplicationContextDBConnect db = new ApplicationContextDBConnect();
+
+        public ActionResult BuyPlan(string planId)
+        {
+            var plan = db.PlansTable.FirstOrDefault(p => p.PlanId == planId && p.IsActive);
+            if (plan == null)
+                return HttpNotFound();
+
+            return View(plan);
+        }
+
+        [HttpPost]
+        public ActionResult ProcessPayment(string planId, string paymentMethod)
+        {
+            var userId = Session["UserId"].ToString(); //session logic
+            var member = db.MembersTable.FirstOrDefault(m => m.UserId == userId);
+
+            if (member == null) 
+                return HttpNotFound("Member not found.");
+
+            var plan = db.PlansTable.FirstOrDefault(p => p.PlanId == planId);
+            if (plan == null) 
+                return HttpNotFound("Plan not found.");
+
+            // Simulate payment
+            var paymentSuccess = true; 
+
+            if (paymentSuccess)
+            {
+                var payment = new Payment
+                {
+                    PaymentId = Guid.NewGuid().ToString(),
+                    MemberId = member.MemberId,
+                    PlanId = plan.PlanId,
+                    Amount = plan.PlanPrice,
+                    PaymentDate = DateTime.Now,
+                    PaymentStatus = "Success",
+                    PaymentMethod = paymentMethod,
+                    TransactionId = Guid.NewGuid().ToString()
+                };
+
+                member.PlanId = plan.PlanId;
+                member.PlanStart = DateTime.Now;
+                member.PlanEnd = DateTime.Now.AddDays(plan.PlanDuration);
+
+                db.PaymentTable.Add(payment);
+                db.SaveChanges();
+                ViewBag.Message = "Payment Successful";
+                return RedirectToAction("LoginIndex", "UserLogin");
+            }
+            else
+            {
+                return RedirectToAction("BuyPlan", "Failed Payment");
+            }
+        }
+    }
+
+}
+
+------------------------VIEW
+
+@model GymManagementSystem.Models.PlansTable
+@{
+    var userId = ViewBag.UserId.ToString();
+}
+<h2>Buy Plan - @Model.PlanName</h2>
+<p>Price: Rs.@Model.PlanPrice</p>
+<p>Duration: @Model.PlanDuration months</p>
+<p>Features: @Model.PlanFeatures</p>
+
+@using (Html.BeginForm("ProcessPayment", "Payment", FormMethod.Post))
+{
+    <input type="hidden" value="@Model.PlanId" name="planId" />
+    <input type="hidden" value="@userId" name="userId" />
+    <label for="paymentMethod">Payment Method:</label>
+    <select name="paymentMethod" required>
+        <option value="Credit Card">Credit Card</option>
+        <option value="PayPal">PayPal</option>
+        <option value="UPI">UPI</option>
+        <!--<option value="Cash">Cash</option>-->
+    </select>
+
+    <button type="submit">Pay Now</button>
+}
