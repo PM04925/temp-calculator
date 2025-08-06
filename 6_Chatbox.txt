@@ -1,0 +1,158 @@
+CREATE TABLE Chat (
+MessageId NVARCHAR(50) NOT NULL,
+MessageTo NVARCHAR(50) NOT NULL,
+MessageFrom	NVARCHAR(50) NOT NULL,
+ChatMessage NVARCHAR(1000) NOT NULL,
+MessagePostedOn DATETIME NOT NULL DEFAULT GETDATE(),
+CONSTRAINT PK_Chat_MessageId PRIMARY KEY (MessageId)
+);
+
+---------------------------------------------------------
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chat Window</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .chat-container {
+            margin-top: 50px;
+            width: 400px;
+            height: 600px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: #4a76a8;
+            color: #fff;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #eef1f5;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+            .message.sent {
+                align-items: flex-end;
+            }
+
+            .message.received {
+                align-items: flex-start;
+            }
+
+            .message p {
+                background: #dcf8c6;
+                padding: 10px;
+                border-radius: 8px;
+                max-width: 70%;
+            }
+
+            .message.sent p {
+                background: #cfe9ff;
+            }
+
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #ccc;
+        }
+
+            .chat-input input {
+                flex: 1;
+                padding: 15px;
+                border: none;
+                outline: none;
+                font-size: 14px;
+            }
+
+            .chat-input button {
+                padding: 15px;
+                border: none;
+                background: #4a76a8;
+                color: white;
+                cursor: pointer;
+                font-size: 14px;
+            }
+
+                .chat-input button:hover {
+                    background: #3b5d85;
+                }
+    </style>
+</head>
+<body>
+
+    <div class="chat-container">
+        <div class="chat-header">Chat Room</div>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Type a message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById("chatMessages");
+        const messageInput = document.getElementById("messageInput");
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (message === "") return;
+
+            // Append sent message
+            const messageElem = document.createElement("div");
+            messageElem.classList.add("message", "sent");
+            messageElem.innerHTML = `<p>${message}</p>`;
+            chatMessages.appendChild(messageElem);
+
+            // Clear input
+            messageInput.value = "";
+
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Simulate received message (for demo)
+            setTimeout(() => {
+                const reply = document.createElement("div");
+                reply.classList.add("message", "received");
+                reply.innerHTML = `<p>Echo: ${message}</p>`;
+                chatMessages.appendChild(reply);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 1000);
+        }
+
+        // Enter key support
+        messageInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+
+</body>
+</html>
